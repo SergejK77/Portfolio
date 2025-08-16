@@ -111,25 +111,33 @@
   </script>
   <script>
   // --- Counter (liest Zahl aus dem sichtbaren Text, behält € & Punkte) ---
-  function animateCounter(el, duration = 1600){
-    const raw = el.textContent.trim();
-    const currency = el.dataset.currency || "€";
-    const target = parseInt(raw.replaceAll(/\D/g,''), 10) || 0;
+function animateCounter(el, duration = 1600){
+  const raw = el.textContent.trim();
+  const currency = el.dataset.currency || "€";
+  const target = parseInt(raw.replaceAll(/\D/g,''), 10) || 0;
 
-    const fmt = (n)=> n.toLocaleString('de-DE') + currency;
-    let start = null;
+  const fmt = (n)=> n.toLocaleString('de-DE') + currency;
+  let start = null;
 
-    function step(ts){
-      if(!start) start = ts;
-      const p = Math.min(1, (ts - start) / duration);
-      // easeOutCubic
-      const eased = 1 - Math.pow(1 - p, 3);
-      const val = Math.round(target * eased);
-      el.textContent = fmt(val);
-      if(p < 1) requestAnimationFrame(step);
+  function step(ts){
+    if(!start) start = ts;
+    const p = Math.min(1, (ts - start) / duration);
+    const eased = 1 - Math.pow(1 - p, 3);
+    const val = Math.round(target * eased);
+    el.textContent = fmt(val);
+
+    // Farb-Logik
+    if (val > 0) {
+      el.style.color = "#4ade80"; // hellgrün
+    } else {
+      el.style.color = "#ffffff"; // weiß
     }
-    requestAnimationFrame(step);
+
+    if(p < 1) requestAnimationFrame(step);
   }
+  requestAnimationFrame(step);
+}
+
 
   // --- Pfeile & Bubble automatisch aus <li> erzeugen ---
   function initSavingsCard(){
@@ -344,6 +352,7 @@
   </script>
 </body>
 </html>
+
 
 
 
