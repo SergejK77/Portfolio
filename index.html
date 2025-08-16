@@ -140,6 +140,35 @@
           </article>
         </div>
       </section>
+      <!-- SAVINGS / COUNTER -->
+<article class="card savings-card" id="savings">
+  <h3>Aktuelle Savings</h3>
+  <p class="muted" style="margin-top:-6px">Wird beim Laden animiert.</p>
+
+  <!-- Der anzuzeigende Gesamtbetrag (einfach Wert ändern) -->
+  <div class="amount" aria-live="polite">
+    <span class="counter" data-currency="€">36.000€</span>
+  </div>
+
+  <!-- Pfeil-Indikator (Anzahl = Zahl der <li> unten) -->
+  <div class="indicators" aria-hidden="true"></div>
+
+  <!-- Deine Einzel-Posten – nur hier editieren -->
+  <div class="savings-data" hidden>
+    <ul>
+      <li data-amount="12000" data-note="Monatliche Kosten gesenkt (Tools/Abo)">Saving 1 — 12.000€</li>
+      <li data-amount="20000" data-note="Optimierung Cloud/Infra">Saving 2 — 20.000€</li>
+      <li data-amount="4000"  data-note="Refactoring & Automatisierung">Saving 3 — 4.000€</li>
+    </ul>
+  </div>
+
+  <!-- Hover-Blase -->
+  <div class="bubble" role="tooltip" aria-label="Savings Details">
+    <p class="muted" style="margin:0 0 8px">Aufteilung</p>
+    <ol class="graph-list"></ol>
+  </div>
+</article>
+
 
       <!-- ABOUT -->
       <section id="about" class="split" aria-labelledby="about-heading">
@@ -217,6 +246,7 @@
   </script>
 </body>
 </html>
+
 
 
 
