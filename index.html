@@ -51,6 +51,51 @@
     .chip{ display:inline-flex; gap:8px; align-items:center; padding:8px 12px; border:1px solid var(--line);
            border-radius:999px; text-decoration:none; color:var(--fg); }
     .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+
+    /* Savings Card */
+.savings-card .amount{
+  font-size: clamp(28px, 6vw, 40px);
+  font-weight: 700;
+  letter-spacing: -.01em;
+  margin: 6px 0 10px;
+}
+.savings-card .indicators{
+  display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;
+}
+.savings-card .indicators svg{
+  width: 22px; height: 22px; opacity: .9;
+}
+
+/* Bubble (Tooltip) */
+.savings-card{ position: relative; }
+.savings-card .bubble{
+  position: absolute; right: 16px; bottom: 16px;
+  min-width: 260px; max-width: 320px;
+  background: var(--card); border:1px solid var(--line);
+  border-radius: 12px; padding: 14px 14px 10px;
+  box-shadow: 0 14px 34px rgba(0,0,0,.25);
+  opacity: 0; transform: translateY(6px) scale(.98);
+  pointer-events: none; transition: opacity .15s ease, transform .15s ease;
+  z-index: 2;
+}
+.savings-card:hover .bubble{ opacity: 1; transform: translateY(0) scale(1); }
+
+/* „Kinder-Verbindungen“ – vertikale Linie + Knoten */
+.graph-list{
+  margin: 0; padding-left: 22px; list-style: none; position: relative;
+}
+.graph-list::before{
+  content:""; position:absolute; left:9px; top:0; bottom:0; width:2px;
+  background: var(--line);
+}
+.graph-list li{ position: relative; margin: 8px 0; }
+.graph-list li::before{
+  content:""; position:absolute; left:-13px; top:.6em; width:10px; height:10px;
+  border-radius:50%; background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.graph-list small{ color: var(--muted); display:block; margin-top:2px; }
+
   </style>
 
   <!-- Schema.org Person -->
@@ -64,6 +109,59 @@
     "jobTitle":"Softwareentwickler"
   }
   </script>
+  <script>
+  // --- Counter (liest Zahl aus dem sichtbaren Text, behält € & Punkte) ---
+  function animateCounter(el, duration = 1600){
+    const raw = el.textContent.trim();
+    const currency = el.dataset.currency || "€";
+    const target = parseInt(raw.replaceAll(/\D/g,''), 10) || 0;
+
+    const fmt = (n)=> n.toLocaleString('de-DE') + currency;
+    let start = null;
+
+    function step(ts){
+      if(!start) start = ts;
+      const p = Math.min(1, (ts - start) / duration);
+      // easeOutCubic
+      const eased = 1 - Math.pow(1 - p, 3);
+      const val = Math.round(target * eased);
+      el.textContent = fmt(val);
+      if(p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // --- Pfeile & Bubble automatisch aus <li> erzeugen ---
+  function initSavingsCard(){
+    const card = document.querySelector('.savings-card');
+    if(!card) return;
+
+    // 1) Counter
+    const counter = card.querySelector('.counter');
+    if(counter) animateCounter(counter);
+
+    // 2) Pfeil-Indikator (Anzahl = Items)
+    const items = [...card.querySelectorAll('.savings-data li')];
+    const ind   = card.querySelector('.indicators');
+    const arrow = `<svg viewBox="0 0 24 24" fill="none"><path d="M4 12h12m0 0l-4-4m4 4l-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    ind.innerHTML = items.map(()=> arrow).join('');
+
+    // 3) Bubble-Inhalt bauen (verbundene Liste)
+    const ol = card.querySelector('.bubble .graph-list');
+    ol.innerHTML = items.map(li => {
+      const amount = li.getAttribute('data-amount') || '';
+      const note   = li.getAttribute('data-note') || '';
+      // Betrag hübsch formatiert
+      const euro = Number(amount || '0').toLocaleString('de-DE') + '€';
+      const title = li.textContent.replace(/\s*—\s*[\d\.\,]+€/,'').trim(); // Text vor Betrag
+      return `<li><strong>${title}</strong> — ${euro}<small>${note}</small></li>`;
+    }).join('');
+  }
+
+  // Init nach DOM Ready
+  document.addEventListener('DOMContentLoaded', initSavingsCard);
+</script>
+
 </head>
 <body>
   <div class="wrap">
@@ -246,6 +344,7 @@
   </script>
 </body>
 </html>
+
 
 
 
